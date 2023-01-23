@@ -1,12 +1,7 @@
 local lib = {}
 lib.__index = lib
 
-type config = {
-	Name: string,
-	Color: Color3
-}
-
-function lib:Draw(Parent: Instance, config: config)
+function lib:Draw(Parent, config)
 	local self = setmetatable({}, lib)
 
 	local ESP = Instance.new("Folder")
@@ -109,11 +104,11 @@ function lib:Delete()
 	self.ESP:Remove()
 end
 
-function lib:SetDistance(newDistance: number)
+function lib:SetDistance(newDistance)
 	self.object.MaxDistance = newDistance
 end
 
-function lib:DeleteAfter(seconds: number, callback: ()->())
+function lib:DeleteAfter(seconds, callback)
 	task.delay(seconds, function()
 		self:Delete()
 		callback()
