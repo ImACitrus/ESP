@@ -1,28 +1,10 @@
 local lib = {}
-lib.__index = lib
+local list = {}
 
 function lib:Draw(Parent, config)
-	local self = setmetatable({}, lib)
 
 	local ESP = Instance.new("Folder")
 	ESP.Name = "ESP"
-	ESP.Parent = nil
-
-	local Name = Instance.new("BillboardGui")
-	Name.Name = "Name"
-	Name.Size = UDim2.fromScale(0.5, 1)
-	Name.SizeOffset = Vector2.new(0, 4.5)
-
-	Name.MaxDistance = 45
-	Name.LightInfluence = 1
-
-	Name.Archivable = true
-	Name.Active = true
-	Name.Enabled = true
-	Name.AlwaysOnTop = true
-	Name.ClipsDescendants = false
-	Name.ResetOnSpawn = true
-	Name.AutoLocalize = true
 
 	local Object = Instance.new("BillboardGui")
 	Object.Size = UDim2.fromScale(5, 6.5)
@@ -39,26 +21,8 @@ function lib:Draw(Parent, config)
 	Object.ResetOnSpawn = true
 	Object.AutoLocalize = true
 
-	Name.Adornee = nil
 	Object.Adornee = nil
-
-	Name.Parent = ESP
 	Object.Parent = ESP
-
-	local value = Instance.new("TextLabel")
-	value.Name = "value"
-	value.FontFace = Font.fromEnum(Enum.Font.SourceSansSemibold)
-
-	value.Size = UDim2.fromScale(1, 0.7)
-	value.AnchorPoint = Vector2.new(0.5, 0.5)
-	value.Position = UDim2.fromScale(0.5, 0.5)
-
-	value.Visible = true
-	value.Transparency = 1
-	value.ZIndex = 1
-
-	value.TextScaled = true
-	value.ClipsDescendants = false
 
 	local border = Instance.new("Frame")
 	border.Name = "border"
@@ -72,56 +36,39 @@ function lib:Draw(Parent, config)
 	border.ZIndex = 1
 
 	border.ClipsDescendants = false
-
-	value.Parent = Name
 	border.Parent = Object
 
-	local UIScale = Instance.new("UIScale")
-	UIScale.Scale = 3
-
 	local UIStroke = Instance.new("UIStroke")
+	
 	UIStroke.Thickness = 4
-
-	UIScale.Parent = value
 	UIStroke.Parent = border
+	UIStroke.Color = config.Color
 
-	self.ESP = ESP
+	list[Parent.Name] = {
+		["ESP"] = ESP,
+		["Objects"] = {
+			["border"] = Object
+		}
+	}
 
-	self.name = self.ESP:WaitForChild("Name")
-	self.object = self.ESP:WaitForChild("Object")
+	list[Parent.Name].ESP.Parent = Parent
+	list[Parent.Name].Objects.border.Parent = ESP
 
-	self.name:WaitForChild("value")
-	self.object:WaitForChild("border")
+	list[Parent.Name].Objects.border.Adornee = Parent:FindFirstChild("HumanoidRootPart")
 
-	self.name.Adornee = Parent
-	self.object.Adornee = Parent
-
-	self.ESP.Parent = Parent
-	return self
 end
 
-function lib:Delete()
-	self.ESP:Remove()
-end
-
-function lib:SetDistance(newDistance)
-	self.object.MaxDistance = newDistance
-end
-
-function lib:DeleteAfter(seconds, callback)
-	task.delay(seconds, function()
-		self:Delete()
-		callback()
-	end)
-end
-
-function lib:Containing(name, delete)
-	if string.lower(self.name.value.Text) == string.lower(name) then
-		if delete then self:Delete() else
-			return true
-		end
+function lib:Delete(object)
+	if typeof(object) ~= "Instance" and type(object) == "string" then
+		workspace:FindFirstChild(object, true):FindFirstChild("ESP"):Remove()
+	elseif typeof(object) == "Instance" then
+		object:FindFirstChild("ESP"):Remove()
 	end
-	return false
+end
+
+function lib:SetDistance(object, newDistance)
+	local tabl = list[type(object)=="string" and object or game:GetService("Players"):GetPlayers()[math.random(1, #game:GetService("Players"):GetPlayers())].Name]
+	tabl.Objects.__object.MaxDistance = newDistance
 end
 
 return lib
