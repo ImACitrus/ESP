@@ -67,8 +67,7 @@ function lib:Delete(object)
 end
 
 function lib:SetDistance(object, newDistance)
-	local tabl = list[type(object)=="string" and object or game:GetService("Players"):GetPlayers()[math.random(1, #game:GetService("Players"):GetPlayers())].Name]
-	tabl.Objects.__object.MaxDistance = newDistance
+	list[object].Objects.__object.MaxDistance = newDistance
 end
 
 return lib
